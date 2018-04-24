@@ -8,7 +8,8 @@ void *thread_function(void *arg) {
     for (i = 0; i < 20; i++) {
         j = myglobal;
         j++;
-        printf(".");
+        printf("j = %d\n", j);
+        //printf(".");
         fflush(stdout);
         sleep(1);
         myglobal = j;
@@ -25,7 +26,8 @@ int main() {
     }
     for (i = 0; i < 20; i++) {
         myglobal = myglobal + 1;
-        printf("o");
+        printf("m = %d\n", myglobal);
+        //printf("o");
         fflush(stdout);
         sleep(1);
     }
