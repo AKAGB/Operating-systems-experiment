@@ -9,16 +9,16 @@ sig_usr(int signo) /* one signal handler for SIGUSR1 and SIGUSR2 */
 void TELL_WAIT(void)
 {
     if (signal(SIGUSR1, sig_usr) == SIG_ERR)
-        err_sys("signal(SIGUSR1) error");
+        printf("signal(SIGUSR1) error");
     if (signal(SIGUSR2, sig_usr) == SIG_ERR)
-        err_sys("signal(SIGUSR2) error");
+        printf("signal(SIGUSR2) error");
     sigemptyset(&zeromask);
     sigemptyset(&newmask);
     sigaddset(&newmask, SIGUSR1);
     sigaddset(&newmask, SIGUSR2);
     /* Block SIGUSR1 and SIGUSR2, and save current signal mask */
     if (sigprocmask(SIG_BLOCK, &newmask, &oldmask) < 0)
-        err_sys("SIG_BLOCK error");
+        printf("SIG_BLOCK error");
 }
 void TELL_PARENT(pid_t pid)
 {
@@ -31,7 +31,7 @@ void WAIT_PARENT(void)
     sigflag = 0;
     /* Reset signal mask to original value */
     if (sigprocmask(SIG_SETMASK, &oldmask, NULL) < 0)
-        err_sys("SIG_SETMASK error");
+        printf("SIG_SETMASK error");
 }
 void TELL_CHILD(pid_t pid)
 {
@@ -44,5 +44,5 @@ void WAIT_CHILD(void)
     sigflag = 0;
     /* Reset signal mask to original value */
     if (sigprocmask(SIG_SETMASK, &oldmask, NULL) < 0)
-        err_sys("SIG_SETMASK error");
+        printf("SIG_SETMASK error");
 }
