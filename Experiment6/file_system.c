@@ -9,15 +9,18 @@
 
 #define LENGTH 100
 
-const char *tab = "   ";
+// tree的输出格式，定义该level是否需要输出"|" 
+int format[LENGTH] = {0};
+const char *tab = "    ";
 
 void list_info(struct dirent *dirp, char *path) {
     struct stat buf;
     char tmpBuf[LENGTH];
     char now[LENGTH] = {0};
     getcwd(now, LENGTH);
-    chdir(path);
-    if (stat(path, &buf) == -1) {
+    int result = chdir(path);
+    // printf("%d %s\n", result, path);
+    if (stat(".", &buf) == -1) {
         printf("error!\n");
         exit(1);
     }
@@ -33,8 +36,47 @@ void list_info(struct dirent *dirp, char *path) {
     chdir(now);
 }
 
-void show_dir(char *path) {
+void print_tab(int n) {
+    int i;
+    for (i = 0; i < n; i++)
+        printf("%s", tab);
+}
+
+void show_dir(char *dir, int level) {
+    char now[LENGTH] = {0};
+    getcwd(now, LENGTH);
+    chdir(dir);
+
+    print_tab(level);
+    printf("%s\n", dir);
+
+    DIR *dirptr;
+    struct dirent *dirp;
+    int cnt = 0;
+
+    // 计算当前层目录下有多少文件和目录
+    if ((dirptr = opendir(".")) != NULL) 
+        while ((dirp = readdir(dirptr)) != NULL) 
+            cnt++;
     
+    
+
+    if ((dirptr = opendir(".")) != NULL) {
+        while ((dirp = readdir(dirptr)) != NULL) {
+            // printf("%s\n", dirp->d_name);
+            if (dirp->d_type == 4) {
+                if (strcmp(dirp->d_name, "..") != 0 && strcmp(dirp->d_name, ".") != 0) {
+                    show_dir(dirp->d_name, level+1);
+                }  
+            }
+            else {
+                print_tab(level+1);
+                printf("%s\n", dirp->d_name);
+            }
+        }
+    }
+
+    chdir(now);
 }
 
 void delete_dir(char *dir) {
@@ -55,7 +97,7 @@ void delete_dir(char *dir) {
                 }  
             }
             else {
-                printf("Delete %s/%s\n", dir, dirp->d_name);
+                // printf("Delete %s/%s\n", dir, dirp->d_name);
                 remove(dirp->d_name);
             }
         }
@@ -160,8 +202,9 @@ int main()
                 closedir(dirptr);
             }
         }
-        else if (strcmp(ins, "tree")) {
+        else if (strcmp(ins, "tree") == 0) {
             if (strlen(obj) == 0) sprintf(obj, "%c", '.');
+            show_dir(obj, 0);
         }
         else {
             if (strlen(cmd) != 1) printf("No such command\n");
